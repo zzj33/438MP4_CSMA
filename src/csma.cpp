@@ -89,19 +89,20 @@ void printInfo() {
 
 
 void transmittion(int tick) {
+    NodeList[busy[0]].backOff = 0;
+    transT--;
+    transSlot++;
+
     if (transT == 0) {
+        NodeList[busy[0]].colCnt = 0;
         NodeList[busy[0]].setBackOff(tick);
         transT = L;
         busy.erase(busy.begin());
-    } else {
-        NodeList[busy[0]].backOff = 0;
-        transT--;
-        transSlot++;
-    }
+    } 
+
 }
 
 int main(int argc, char** argv) {
-    //printf("Number of arguments: %d", argc);
     if (argc != 2) {
         printf("Usage: ./csma input.txt\n");
         return -1;
@@ -109,21 +110,17 @@ int main(int argc, char** argv) {
 
     initialize(argv[1]);
     transT = L;
-    printInfo();
+    // printInfo();
     for (int tick = 0; tick < T; tick++) {
-        if (tick == 9171) {
-
-        }
-        // int s = busy.size();
         if (busy.size() == 1) {
             //transmittion
-            transmittion(tick);
+            transmittion(tick + 1);
             
         } else if (busy.size() > 1) {
             //collision
             int sz = busy.size();
             for (int i = 0; i < sz; i++) {
-                NodeList[busy[i]].collision(tick);
+                NodeList[busy[i]].collision(tick + 1);
             }
             busy.erase(busy.begin(), busy.begin() + sz);
         } else { 
@@ -133,14 +130,8 @@ int main(int argc, char** argv) {
                 }
                 NodeList[i].backOff--;
             }
-            if ((busy.size()) == 1) {
-                transmittion(tick);
-            }
         }
-        // cout<<"tick: "<<tick<<endl;
-        // printInfo();
     }
-    cout<<float(transSlot) / T<<endl;
     ofstream outfile;
     outfile.open("output.txt", ios::out | ios::trunc);
     outfile<<fixed<<setprecision(2);
