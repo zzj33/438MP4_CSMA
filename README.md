@@ -1,2 +1,2 @@
-# 438MP4_CSMA
+# CSMA simulator
  
